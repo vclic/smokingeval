@@ -1,0 +1,6 @@
+results/
+smokingbenchmark/
+__pycache__/
+*.pyc
+.env
+.venv/
