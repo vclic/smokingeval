@@ -1,0 +1,25 @@
+{
+  "system": "claude",
+  "model_requested": "claude-haiku-4-5",
+  "models_served": [
+    "claude-haiku-4-5-20251001"
+  ],
+  "sdk": "anthropic 1.7.0",
+  "prompt_version": "v2",
+  "structured_outputs": "messages.parse(output_format=ClaudeExtractionV2); scored fields = SmokingExtraction",
+  "thinking": "off (Haiku 4.5 default)",
+  "effort": "n/a (not supported on Haiku 4.5)",
+  "max_tokens": 16000,
+  "started_utc": "2026-09-19T03:27:07.050262+00:00",
+  "wall_clock_s": 147.89,
+  "concurrency": 16,
+  "n_requested": 1000,
+  "n_ok": 999,
+  "n_errors": 1,
+  "input_tokens": 3299380,
+  "output_tokens": 182227,
+  "cost_usd": 4.2105,
+  "pricing": "$1.00 / $5.00 per 1M input/output tokens (Anthropic list price)",
+  "median_latency_s": 2.161,
+  "condition": "messy"
+}

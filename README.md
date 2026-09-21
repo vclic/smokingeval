@@ -89,6 +89,8 @@ That is 9,000 notes and cost us $44.62 in total, most of it Sonnet. It takes abo
 | complex | claude-haiku-4-5 | claude-haiku-4-5-20251001 | 981 | 977 | 803 | 1000 | 4.43 | 160 | 2.41 |
 | complex | claude-sonnet-5 | claude-sonnet-5 | 997 | 997 | 993 | 1000 | 11.42 | 212 | 3.20 |
 
+The runs behind that table are in `study_results/`, one folder per system and condition, holding the predictions and the run metadata exactly as they came out of the two services. `python summarize.py study_results` rebuilds the table from them, and `python score.py study_results/complex/typesafe --condition complex --by pack_years_source` is how we looked at where a system went wrong.
+
 USPSTF, ACS, and "all 3 fields" are counts of notes out of 1,000. Your numbers will not match ours exactly. Vendors update models behind the same name, prices change, and latency depends on load and on how far you are from the service. The prompt, the question set, and the scoring code here are the ones we ran, so differences should come from the models rather than from the harness.
 
 ## How the two systems are set up
@@ -109,6 +111,7 @@ USPSTF, ACS, and "all 3 fields" are counts of notes out of 1,000. Your numbers w
 | `score.py` | Scores one run against the answer key |
 | `summarize.py` | Collects all runs into one table |
 | `FROZEN.md` | The hashes recorded when the two pipelines were frozen |
+| `study_results/` | The nine runs from the study: predictions and run metadata |
 
 ## Citation
 

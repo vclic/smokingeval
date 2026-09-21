@@ -1,0 +1,25 @@
+{
+  "system": "claude",
+  "model_requested": "claude-sonnet-5",
+  "models_served": [
+    "claude-sonnet-5"
+  ],
+  "sdk": "anthropic 1.7.0",
+  "prompt_version": "v2",
+  "structured_outputs": "messages.parse(output_format=ClaudeExtractionV2); scored fields = SmokingExtraction",
+  "thinking": "adaptive (model default)",
+  "effort": "low",
+  "max_tokens": 16000,
+  "started_utc": "2026-09-19T03:10:55.676075+00:00",
+  "wall_clock_s": 183.03,
+  "concurrency": 16,
+  "n_requested": 1000,
+  "n_ok": 1000,
+  "n_errors": 0,
+  "input_tokens": 4301015,
+  "output_tokens": 214363,
+  "cost_usd": 10.7457,
+  "pricing": "$2.00 / $10.00 per 1M input/output tokens (Anthropic list price)",
+  "median_latency_s": 2.639,
+  "condition": "messy"
+}

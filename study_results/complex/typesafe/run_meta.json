@@ -1,0 +1,22 @@
+{
+  "system": "typesafe",
+  "model_requested": "jev-1.13.0",
+  "models_served": [
+    "jev-1.13.0"
+  ],
+  "pipeline_version": "v2",
+  "settings": "1 request/note, ~34 Choice questions; arithmetic and dates in code",
+  "sdk": "typesafe-sdk 0.7.0",
+  "started_utc": "2026-09-19T03:13:59.104529+00:00",
+  "wall_clock_s": 39.31,
+  "concurrency": 16,
+  "n_requested": 1000,
+  "n_ok": 1000,
+  "n_errors": 0,
+  "input_tokens": 15272230,
+  "output_tokens": 12854571,
+  "cost_usd": 0.641434,
+  "pricing": "$0.042 per 1M input tokens, output free (docs.typesafe.ai/models, retrieved 2026-09-18)",
+  "median_latency_s": 0.453,
+  "condition": "complex"
+}
