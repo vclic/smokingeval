@@ -40,7 +40,7 @@ def cost(model: str, usage) -> float:
 
 
 async def run(benchmark: Path, condition: str, out: Path, model: str, effort: str | None,
-              concurrency: int, limit: int | None, ids: list[str] | None):
+              concurrency: int, limit: int | None, ids: list[str] | None, cache: bool = False):
     load_env()
     notes = load_notes(benchmark, condition, limit, ids)
     pred_path = out / "predictions.jsonl"
@@ -49,6 +49,11 @@ async def run(benchmark: Path, condition: str, out: Path, model: str, effort: st
     print(f"{len(todo)} notes to run ({len(skip)} already done) -> {pred_path}")
 
     extra = {"output_config": {"effort": effort}} if effort else {}
+    # The system prompt and the output schema are identical for every note. Marking the system block
+    # cacheable lets Anthropic bill the repeated prefix at a tenth of the input price. The runs
+    # reported in the study did not use this; pass --cache to turn it on.
+    system = ([{"type": "text", "text": CODEBOOK, "cache_control": {"type": "ephemeral"}}] if cache
+              else CODEBOOK)
     api_key = os.environ.get("SMOKING_BENCH_ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")
     ws = os.environ.get("SMOKING_BENCH_ANTHROPIC_WORKSPACE_ID")  # organization-level keys need a workspace
     headers = {"anthropic-workspace-id": ws} if ws else None
@@ -65,7 +70,7 @@ async def run(benchmark: Path, condition: str, out: Path, model: str, effort: st
                     resp = await client.messages.parse(
                         model=model,
                         max_tokens=16000,
-                        system=CODEBOOK,
+                        system=system,
                         messages=[{"role": "user", "content": f"NOTE:\n{n['note_text']}"}],
                         output_format=ClaudeExtractionV2,
                         **extra,
@@ -74,6 +79,8 @@ async def run(benchmark: Path, condition: str, out: Path, model: str, effort: st
                     rec = {"patient_id": n["patient_id"], "model": resp.model, "request_id": resp._request_id,
                            "stop_reason": resp.stop_reason, "input_tokens": resp.usage.input_tokens,
                            "output_tokens": resp.usage.output_tokens, "cost_usd": round(cost(model, resp.usage), 6),
+                           "cache_creation_input_tokens": resp.usage.cache_creation_input_tokens or 0,
+                           "cache_read_input_tokens": resp.usage.cache_read_input_tokens or 0,
                            "latency_s": round(latency, 3)}
                     if resp.stop_reason == "refusal" or resp.parsed_output is None:
                         rec["error"] = f"no parsed output (stop_reason={resp.stop_reason})"
@@ -100,6 +107,9 @@ async def run(benchmark: Path, condition: str, out: Path, model: str, effort: st
             "sdk": f"anthropic {anthropic.__version__}", "condition": condition,
             "structured_outputs": "messages.parse(output_format=ClaudeExtractionV2); scored fields = SmokingExtraction",
             "effort": effort or "model default", "max_tokens": 16000,
+            "prompt_caching": cache,
+            "cache_creation_input_tokens": sum(r.get("cache_creation_input_tokens", 0) for r in billed),
+            "cache_read_input_tokens": sum(r.get("cache_read_input_tokens", 0) for r in billed),
             "started_utc": started, "wall_clock_s": round(wall, 2), "concurrency": concurrency,
             "n_requested": len(todo), "n_ok": len(ok), "n_errors": len(recs) - len(ok),
             "input_tokens": sum(r["input_tokens"] for r in billed),
@@ -125,11 +135,13 @@ def main():
     ap.add_argument("--concurrency", type=int, default=16)
     ap.add_argument("--limit", type=int, help="run only the first N notes (for a quick check)")
     ap.add_argument("--ids", nargs="*", help="run only these patient IDs")
+    ap.add_argument("--cache", action="store_true",
+                    help="cache the system prompt and schema (off in the study, so leave it off to reproduce)")
     a = ap.parse_args()
     bench = benchmark_dir(a.benchmark)
     out = Path(a.out) if a.out else Path("results") / a.condition / a.model
     out.mkdir(parents=True, exist_ok=True)
-    asyncio.run(run(bench, a.condition, out, a.model, a.effort, a.concurrency, a.limit, a.ids))
+    asyncio.run(run(bench, a.condition, out, a.model, a.effort, a.concurrency, a.limit, a.ids, a.cache))
 
 
 if __name__ == "__main__":

@@ -71,15 +71,15 @@ def pct(n, d):
     return f"{100 * n / d:5.1f}% ({n}/{d})" if d else "   n/a"
 
 
-def screening_flags(gold: list[dict], preds: dict) -> dict:
-    """A flag is raised when the extracted values make the patient eligible (USPSTF 2021)."""
+def screening_flags(gold: list[dict], preds: dict, guideline: str = "uspstf2021") -> dict:
+    """A flag is raised when the extracted values make the patient eligible under the guideline."""
     tp = fp = fn = tn = 0
     for g in gold:
         p = preds.get(g["patient_id"]) or {}
         pd = lcs.predicted_decision(p.get("smoking_status"), p.get("pack_years"), p.get("quit_date"),
-                                    int(g["note_date"][:4]), "uspstf2021")
+                                    int(g["note_date"][:4]), guideline)
         pred_flag = pd == "eligible"
-        gold_flags = {d == "eligible" for d in lcs.gold_decisions(g, "uspstf2021")}
+        gold_flags = {d == "eligible" for d in lcs.gold_decisions(g, guideline)}
         if pred_flag in gold_flags:      # a borderline answer key accepts either decision
             tp += pred_flag
             tn += not pred_flag
@@ -90,7 +90,8 @@ def screening_flags(gold: list[dict], preds: dict) -> dict:
     return {"tp": tp, "fp": fp, "fn": fn, "tn": tn,
             "sensitivity": tp / (tp + fn) if tp + fn else None,
             "specificity": tn / (tn + fp) if tn + fp else None,
-            "ppv": tp / (tp + fp) if tp + fp else None}
+            "ppv": tp / (tp + fp) if tp + fp else None,
+            "npv": tn / (tn + fn) if tn + fn else None}
 
 
 def main():
@@ -134,9 +135,13 @@ def main():
         print(f"  {guideline:11s} decision {pct(round(s['accuracy'] * n), n)}"
               f"   missed eligible: {s['missed_eligible']}   wrongly eligible: {s['false_eligible']}")
 
-    f = screening_flags(gold, preds)
-    print(f"  screening flags (USPSTF 2021): TP {f['tp']}  FP {f['fp']}  FN {f['fn']}  TN {f['tn']}  "
-          f"sens {f['sensitivity']:.3f}  spec {f['specificity']:.3f}  PPV {f['ppv']:.3f}")
+    print("-" * 70)
+    print("  screening flags (a flag is raised when the extracted values make the patient eligible)")
+    for guideline in lcs.GUIDELINES:
+        f = screening_flags(gold, preds, guideline)
+        print(f"  {guideline:11s} TP {f['tp']:4d}  FP {f['fp']:3d}  FN {f['fn']:3d}  TN {f['tn']:4d}  "
+              f"sens {f['sensitivity']:.3f}  spec {f['specificity']:.3f}  "
+              f"PPV {f['ppv']:.3f}  NPV {f['npv']:.3f}")
 
     for col in a.by:
         groups = defaultdict(list)

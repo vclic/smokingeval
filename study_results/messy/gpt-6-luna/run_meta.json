@@ -1,0 +1,24 @@
+{
+  "system": "openai",
+  "model_requested": "gpt-6-luna",
+  "models_served": [
+    "gpt-6-luna"
+  ],
+  "sdk": "openai 3.19.0",
+  "condition": "messy",
+  "structured_outputs": "responses.parse(text_format=ClaudeExtractionV2); scored fields = SmokingExtraction",
+  "effort": "none",
+  "max_output_tokens": 16000,
+  "started_utc": "2026-09-23T14:53:33.600262+00:00",
+  "wall_clock_s": 205.57,
+  "concurrency": 16,
+  "n_requested": 1000,
+  "n_ok": 1000,
+  "n_errors": 0,
+  "input_tokens": 2303324,
+  "output_tokens": 166400,
+  "reasoning_tokens": 0,
+  "cost_usd": 0.1925,
+  "pricing": "$0.10 / $0.50 per 1M input/output tokens (OpenAI list price)",
+  "median_latency_s": 3.076
+}

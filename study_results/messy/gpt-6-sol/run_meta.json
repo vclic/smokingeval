@@ -1,0 +1,24 @@
+{
+  "system": "openai",
+  "model_requested": "gpt-6-sol",
+  "models_served": [
+    "gpt-6-sol"
+  ],
+  "sdk": "openai 3.19.0",
+  "condition": "messy",
+  "structured_outputs": "responses.parse(text_format=ClaudeExtractionV2); scored fields = SmokingExtraction",
+  "effort": "low",
+  "max_output_tokens": 16000,
+  "started_utc": "2026-09-23T14:50:05.672968+00:00",
+  "wall_clock_s": 201.93,
+  "concurrency": 16,
+  "n_requested": 1000,
+  "n_ok": 1000,
+  "n_errors": 0,
+  "input_tokens": 2303324,
+  "output_tokens": 161272,
+  "reasoning_tokens": 15311,
+  "cost_usd": 3.7977,
+  "pricing": "$2.00 / $10.00 per 1M input/output tokens (OpenAI list price)",
+  "median_latency_s": 2.94
+}
